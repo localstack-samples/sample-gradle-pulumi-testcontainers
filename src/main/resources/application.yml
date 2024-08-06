@@ -1,0 +1,3 @@
+queue: "ancas-message-queue"
+bucket: "ancas-message-bucket"
+region: "us-east-1"
