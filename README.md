@@ -1,6 +1,9 @@
 
 # Running & Testing a Full Backend Application Using Gradle and LocalStack
 
+Based on [@oleg-nenashev](https://github.com/oleg-nenashev)'s [mocks-as-code-demo](https://github.com/oleg-nenashev/mocks-as-code-demo) project.
+
+
 ## Introduction
 
 In modern software development, it's common to juggle multiple tools to manage, build, and test backend applications. 
