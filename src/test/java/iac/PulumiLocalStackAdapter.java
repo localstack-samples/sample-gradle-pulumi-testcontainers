@@ -41,7 +41,6 @@ public class PulumiLocalStackAdapter {
     private static final Logger LOGGER = Logger.getLogger(PulumiLocalStackAdapter.class.getName());
 
     public static void configure(LocalStackContainer container, String stack, File workDir) throws IOException {
-        final PulumiConfig project = PulumiConfig.read(new File(workDir, "Pulumi.yaml"));
         PulumiConfig.writeTestConfig(container, new File(workDir, "Pulumi." + stack + ".yaml"));
         CONFIGURED = true;
         STACK_NAME = stack;
@@ -51,7 +50,7 @@ public class PulumiLocalStackAdapter {
      * Runs Pulumi Up
      */
     public static void up(File workDir) throws IOException, InterruptedException {
-        run(workDir,"pulumi", "up", "--yes", "--stack", "dev", "--skip-preview");
+        run(workDir,"pulumi", "up", "--yes", "--stack", STACK_NAME, "--skip-preview");
     }
 
     public static void init(File workDir) throws IOException, InterruptedException {
@@ -60,11 +59,10 @@ public class PulumiLocalStackAdapter {
 
     public static void clean(File workDir) throws IOException, InterruptedException {
         run(workDir,"pulumi", "destroy", "-s", STACK_NAME, "--yes");
+        run(workDir,"pulumi", "stack", "rm", STACK_NAME, "--yes");
+
     }
 
-    public static void cancel(File workDir) throws IOException, InterruptedException {
-        run(workDir,"pulumi", "up", "--skip-preview")  ;
-    }
 
     public static void run(File workDir, String ... cli) throws IOException, InterruptedException {
         if (!CONFIGURED) {
@@ -92,10 +90,6 @@ public class PulumiLocalStackAdapter {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     private static class PulumiConfig {
-
-        public String name;
-        public String runtime;
-        public String description;
 
         private static final String CONFIG_TEMPLATE_FILE = "Pulumi.LocalStack.yaml.template";
 

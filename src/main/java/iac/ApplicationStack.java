@@ -12,7 +12,6 @@ public class ApplicationStack {
 
         Pulumi.run(ApplicationStack::createResources);
     }
-
     private static void createResources(Context ctx) {
         AwsConfig config = YamlConfigLoader.loadConfig("application.yml");
 
@@ -21,7 +20,7 @@ public class ApplicationStack {
                         .bucket(config.getBucket())
                         .forceDestroy(true)
                         .build());
-        ctx.export("bucketName", bucket.bucket());
+        ctx.export("bucketArn", bucket.arn());
 
         var queue = new Queue(config.getQueue() + ".fifo", QueueArgs.builder()
                 .name(config.getQueue() + ".fifo")

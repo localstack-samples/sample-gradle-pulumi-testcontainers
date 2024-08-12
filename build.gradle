@@ -8,6 +8,7 @@ plugins {
 group = 'com.example.demo'
 version = '1.0.0-SNAPSHOT'
 description = 'gradle-localstack-pulumi-demo'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
@@ -18,45 +19,44 @@ java {
 repositories {
     mavenCentral()
 }
+
 ext {
     set('awspringVersion', "3.0.3")
-    set('testcontainers.version', "1.20.0")
 }
 
 dependencies {
+    // Pulumi IaC
     implementation 'com.pulumi:pulumi:0.13.0'
     implementation 'com.pulumi:aws:6.47.0'
-    implementation 'org.yaml:snakeyaml:2.2'
 
-    testImplementation platform('org.junit:junit-bom:5.9.1')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-
-
+    // Spring Boot Application
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3'
     implementation 'io.awspring.cloud:spring-cloud-aws-starter-sqs'
 
+    // Common Dependencies
+    implementation 'org.yaml:snakeyaml:2.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2'
+
+    // Testing Dependencies
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.springframework.boot:spring-boot-devtools'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    implementation(enforcedPlatform("org.testcontainers:testcontainers-bom:1.19.8"))
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:localstack'
+    testImplementation 'software.amazon.awssdk:s3'
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
+    // Dependency Management
+    implementation(enforcedPlatform("org.testcontainers:testcontainers-bom:1.20.0"))
     implementation(enforcedPlatform("software.amazon.awssdk:bom:2.21.1"))
-    implementation("software.amazon.awssdk:s3")
-
-    testImplementation("org.testcontainers:testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:localstack")
-
-    testImplementation("org.junit.jupiter:junit-jupiter-api")
-    testImplementation("cloud.localstack:localstack-utils:0.2.15")
-    testImplementation("org.junit.jupiter:junit-jupiter:5.7.1")
-
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
-    testRuntimeOnly("org.slf4j:slf4j-simple:2.0.9")
-    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.17.2'
-
 }
+
 
 dependencyManagement {
     imports {
@@ -64,8 +64,8 @@ dependencyManagement {
     }
 }
 
-test {
-    useJUnitPlatform()
+application {
+    mainClass = 'iac.ApplicationStack'
 }
 
 task initStack(type: Exec) {
@@ -80,10 +80,25 @@ task destroyStack(type: Exec) {
     commandLine 'pulumi', 'destroy', '--yes', '--stack', 'dev'
 }
 
-application {
-    mainClass = 'iac.ApplicationStack'
+
+task initStackLocal(type: Exec) {
+    commandLine 'pulumilocal', 'stack', 'init', 'dev'
 }
 
+task createStackLocal(type: Exec) {
+    commandLine 'pulumilocal', 'up', '--yes', '--stack', 'dev'
+}
+
+task destroyStackLocal(type: Exec) {
+    commandLine 'pulumilocal', 'destroy', '--yes', '--stack', 'dev'
+}
+
+task runSpringBootAppWithLocalStack(type: JavaExec) {
+    description = 'Run the Spring Boot application'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'app.Application'
+    args = ['--spring.profiles.active=local']
+}
 
 task runSpringBootApp(type: JavaExec) {
     description = 'Run the Spring Boot application'

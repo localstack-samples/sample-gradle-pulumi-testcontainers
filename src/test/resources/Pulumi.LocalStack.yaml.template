@@ -1,8 +1,8 @@
 config:
   aws:region: {AWS_REGION}
-  aws:s3UsePathStyle: "true"
   aws:accessKey: {AWS_ACCESS_KEY}
   aws:secretKey: {AWS_SECRET_KEY}
+  aws:s3UsePathStyle: "true"
   aws:skipCredentialsValidation: "true"
   aws:skipRequestingAccountId: "true"
 

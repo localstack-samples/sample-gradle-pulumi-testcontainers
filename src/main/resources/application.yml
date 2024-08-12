@@ -1,3 +1,3 @@
-queue: "ancas-message-queue"
-bucket: "ancas-message-bucket"
+queue: "6578-demo-message-queue"
+bucket: "6578-demo-message-bucket"
 region: "us-east-1"
