@@ -35,7 +35,7 @@ In this project, we'll use Pulumi for Java to create necessary AWS resources, su
 These resources will be provisioned locally using LocalStack during the testing phase.
 
 Let's define the infrastructure using Pulumi within a dedicated Gradle task. 
-This task will automate the creation of the infrastructure every time we run our application. 
+This task will automate the creation of the infrastructure individually, on demand, or every time we run our application, by chaining the tasks. 
 We have two options here, defining a task for local resources and telling our application what endpoints to use, and a second task for real AWS resources and defaulting to our preconfigured clients.
 
 ```groovy
@@ -48,6 +48,7 @@ task createStack(type: Exec) {
 }
 ```
 
+The [`pulumilocal`](https://github.com/localstack/pulumi-local) command is a thin wrapper around the `pulumi` command line interface to use Pulumi with LocalStack.
 These tasks will pair with the `local` profile where we configure the LocalStack endpoints:
 
 ```groovy
@@ -127,7 +128,7 @@ In a nutshell, the Spring Boot application can be described by the following dia
 
 With our infrastructure in place, the next step is to build and run our Spring Boot application. 
 Gradle makes this straightforward, handling dependency management, building, and running the application.
-We have already defined the Gradle task for building the application.
+We have already defined the Gradle task for building and running the application. So depending on your environment you'll use `runSpringBootApp` or `runSpringBootAppWithLocalStack`.
 
 ## Testing with LocalStack
 
@@ -301,6 +302,8 @@ The `testPostAndGetMessage` method is a core test that verifies the application'
 It simulates the complete flow of creating a message via a POST request and retrieving it via a GET request, asserting that the operations are successful and the data is correctly handled.
 
 This test demonstrates how to effectively test a Spring Boot application in a controlled environment that closely mirrors production, leveraging the power of Spring Boot, Pulumi, and LocalStack together.
+
+All of these fall under a singular command: `gradle test`.
 
 ## Bringing It All Together
 
